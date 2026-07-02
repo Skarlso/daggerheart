@@ -1,3 +1,4 @@
 {
-    "js/ts.preferGoToSourceDefinition": true
+    "js/ts.preferGoToSourceDefinition": true,
+    "codeQL.githubDatabase.download": "never"
 }
