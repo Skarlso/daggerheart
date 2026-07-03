@@ -17,11 +17,6 @@
     {{!-- Item Name --}}
     <span class="item-name">{{localize item.name}}</span>
 
-    {{!-- Resource --}}
-    {{#if (and (eq type 'weapon') item.system.resource)}}
-        {{> "systems/daggerheart/templates/sheets/global/partials/item-resource.hbs"}}
-    {{/if}}
-
     {{!-- Tags Start --}}
     {{#with item}}
         <div class="item-labels">

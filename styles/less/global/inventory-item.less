@@ -243,13 +243,6 @@
                 / 40px 1fr min-content;
             column-gap: 8px;
 
-            &:has(> .item-resource, > .item-resources) {
-                grid-template:
-                    'img name resource controls' auto
-                    'img labels labels labels' 1fr
-                    / 40px 1fr min-content min-content;
-            }
-
             > .img-portait {
                 grid-area: img;
             }
@@ -257,15 +250,6 @@
                 align-self: end;
                 line-height: 1;
                 padding-bottom: 1px;
-            }
-            > .item-resource,
-            > .item-resources {
-                grid-area: resource;
-                align-self: center;
-
-                input {
-                    width: 40px;
-                }
             }
             > .controls {
                 grid-area: controls;
