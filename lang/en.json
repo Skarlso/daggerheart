@@ -2654,6 +2654,7 @@
             },
             "Weapon": {
                 "weaponType": "Weapon Type",
+                "configureAttack": "Configure Attack",
                 "primaryWeapon": {
                     "full": "Primary Weapon",
                     "short": "Primary"

@@ -160,7 +160,7 @@ export default class DHActionBaseConfig extends DaggerheartSheet(ApplicationV2) 
             context.allDamageTypesUsed = !getUnusedDamageTypes(this.action.damage.parts).length;
 
             if (this.action.damage.hasOwnProperty('includeBase') && this.action.type === 'attack')
-                context.hasBaseDamage = !!this.action.parent.attack;
+                context.hasBaseDamage = !!this.action.parent.attack && !this.action.baseAction;
         }
 
         context.costOptions = this.getCostOptions();
