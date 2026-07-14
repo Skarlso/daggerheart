@@ -31,6 +31,10 @@
                     {{/unless}}
                 </legend>
 
+                {{#if (eq dmg.applyTo 'weaponResource')}}
+                    {{formField ../fields.fullRestore value=dmg.fullRestore name=(concat ../path "damage.parts." dmg.applyTo ".fullRestore") localize=true classes="checkbox"}}
+                {{/if}}
+                {{#unless dmg.fullRestore}}
                 {{#if (and (not @root.isNPC) @root.hasRoll (not dmg.base))}}
                     {{formField ../fields.resultBased value=dmg.resultBased name=(concat "damage.parts." dmg.applyTo ".resultBased") localize=true classes="checkbox"}}
                 {{/if}}
@@ -48,6 +52,7 @@
                 {{else}}
                     {{> formula fields=../fields.value.fields type=../fields.type dmg=dmg source=dmg.value target="value" key=dmg.applyTo path=../path}}
                 {{/if}}
+                {{/unless}}
 
                 {{#if (and (eq dmg.applyTo 'hitPoints') (ne @root.source.type 'healing'))}}
                     {{formField ../fields.type value=dmg.type name=(concat ../path "damage.parts." dmg.applyTo ".type") localize=true}}

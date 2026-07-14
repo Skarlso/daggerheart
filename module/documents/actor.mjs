@@ -766,17 +766,21 @@ export default class DhpActor extends Actor {
         Object.entries(healings).forEach(([key, healing]) => {
             healing.parts.forEach(part => {
                 const update = updates.find(u => u.key === key);
-                if (update) update.value += part.total;
-                else updates.push({ value: part.total, key });
+                if (update) {
+                    update.value += part.total;
+                    update.clear ||= !!part.fullRestore;
+                } else updates.push({ value: part.total, key, clear: !!part.fullRestore });
             });
         });
 
-        updates.forEach(
-            u =>
-                (u.value = !(u.key === 'fear' || this.system?.resources?.[u.key]?.isReversed === false)
-                    ? u.value * -1
-                    : u.value)
-        );
+        updates.forEach(u => {
+            if (u.key === CONFIG.DH.GENERAL.healingTypes.weaponResource.id) return;
+            u.value = !(u.key === 'fear' || this.system?.resources?.[u.key]?.isReversed === false)
+                ? u.value * -1
+                : u.value;
+        });
+
+        this.convertResourceHealingToReload(updates);
 
         await this.modifyResource(updates);
 
@@ -802,7 +806,7 @@ export default class DhpActor extends Actor {
         resources.forEach(r => {
             if (r.itemId) {
                 const { path, value } = game.system.api.fields.ActionFields.CostField.getItemIdCostUpdate(r);
-                updates.items[r.key] = {
+                updates.items[`${r.itemId}-${r.key}`] = {
                     target: r.target,
                     resources: { [path]: value }
                 };
@@ -871,6 +875,22 @@ export default class DhpActor extends Actor {
             return 4;
         }
         return damage >= this.system.damageThresholds.severe ? 3 : damage >= this.system.damageThresholds.major ? 2 : 1;
+    }
+
+    convertResourceHealingToReload(updates) {
+        const resourceIndex = updates.findIndex(u => u.key === CONFIG.DH.GENERAL.healingTypes.weaponResource.id);
+        if (resourceIndex === -1) return;
+        const [reload] = updates.splice(resourceIndex, 1);
+        const weapons = this.items.filter(i => i.type === 'weapon' && i.system.equipped && i.system.resource);
+        for (const weapon of weapons) {
+            updates.push({
+                key: CONFIG.DH.GENERAL.itemAbilityCosts.resource.id,
+                value: reload.value,
+                clear: reload.clear,
+                itemId: weapon.id,
+                target: weapon
+            });
+        }
     }
 
     convertStressDamageToHP(resources) {

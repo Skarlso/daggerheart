@@ -45,9 +45,10 @@ export default class DamageField extends fields.SchemaField {
             return;
 
         let formulas = this.damage.parts.map(p => ({
-            formula: DamageField.getFormulaValue.call(this, p, config).getFormula(this.actor),
+            formula: p.fullRestore ? '0' : DamageField.getFormulaValue.call(this, p, config).getFormula(this.actor),
             damageTypes: p.applyTo === 'hitPoints' && !p.type.size ? new Set(['physical']) : p.type,
-            applyTo: p.applyTo
+            applyTo: p.applyTo,
+            fullRestore: p.fullRestore
         }));
 
         if (!formulas.length) return false;
@@ -67,6 +68,7 @@ export default class DamageField extends fields.SchemaField {
 
         if (DamageField.getAutomation() === CONFIG.DH.SETTINGS.actionAutomationChoices.always.id)
             damageConfig.dialog.configure = false;
+        if (formulas.every(f => f.fullRestore)) damageConfig.dialog.configure = false;
         if (config.hasSave) config.onSave = damageConfig.onSave = this.save.damageMod;
 
         damageConfig.source.message = messageId;
@@ -296,6 +298,10 @@ export class DHResourceData extends foundry.abstract.DataModel {
             resultBased: new fields.BooleanField({
                 initial: false,
                 label: 'DAGGERHEART.ACTIONS.Settings.resultBased.label'
+            }),
+            fullRestore: new fields.BooleanField({
+                initial: false,
+                label: 'DAGGERHEART.ACTIONS.Settings.fullRestore.label'
             }),
             value: new fields.EmbeddedDataField(DHActionDiceData),
             valueAlt: new fields.EmbeddedDataField(DHActionDiceData)

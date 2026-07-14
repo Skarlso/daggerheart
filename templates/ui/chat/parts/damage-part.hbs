@@ -11,7 +11,7 @@
     <div class="roll-part-extra on-reduced">
         <div class="wrapper">
             {{#each damage as | roll index | }}
-                <div class="roll-formula">{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.inChatRoll')}}: {{total}}</div>
+                <div class="roll-formula">{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.inChatRoll')}}: {{#if parts.[0].fullRestore}}{{localize "DAGGERHEART.ACTIONS.Settings.fullRestore.inChatRoll"}}{{else}}{{total}}{{/if}}</div>
             {{/each}}
         </div>
     </div>
@@ -21,7 +21,7 @@
                 {{#each damage as | roll index | }}
                     <fieldset>
                         <legend>
-                            {{#if ../hasHealing}}{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.name')}}{{else}}{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.inChatRoll')}}{{/if}} <div class="roll-formula">{{localize "DAGGERHEART.GENERAL.total"}}: {{roll.total}}</div>{{#if (and (eq index "hitPoints") ../isDirect)}} <div class="roll-formula">{{localize "DAGGERHEART.CONFIG.DamageType.direct.short"}}</div>{{/if}}
+                            {{#if ../hasHealing}}{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.name')}}{{else}}{{localize (concat 'DAGGERHEART.CONFIG.HealingType.' index '.inChatRoll')}}{{/if}} <div class="roll-formula">{{localize "DAGGERHEART.GENERAL.total"}}: {{#if roll.parts.[0].fullRestore}}{{localize "DAGGERHEART.ACTIONS.Settings.fullRestore.inChatRoll"}}{{else}}{{roll.total}}{{/if}}</div>{{#if (and (eq index "hitPoints") ../isDirect)}} <div class="roll-formula">{{localize "DAGGERHEART.CONFIG.DamageType.direct.short"}}</div>{{/if}}
                         </legend>
                         {{#each roll.parts}}
                             {{#if (and (not @root.hasHealing) damageTypes.length)}}
@@ -32,6 +32,7 @@
                                     {{/each}}
                                 <div class="roll-formula">{{total}}</div></span></label>
                             {{/if}}
+                            {{#unless fullRestore}}
                             <div class="roll-dice">
                                 {{#if dice.length}}
                                     {{#each dice}}
@@ -60,6 +61,7 @@
                                     </div>
                                 {{/if}}
                             </div>
+                            {{/unless}}
                         {{/each}}
                     </fieldset>
                 {{/each}}
