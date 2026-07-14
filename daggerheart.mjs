@@ -267,6 +267,10 @@ Hooks.on('i18nInit', () => {
 });
 
 Hooks.on('setup', () => {
+    if (game.user.isGM) {
+        document.body.dataset.gm = true;
+    }
+
     CONFIG.statusEffects = [
         ...CONFIG.statusEffects.filter(x => !['dead', 'unconscious'].includes(x.id)),
         ...Object.values(SYSTEM.GENERAL.conditions()).map(x => ({
@@ -390,7 +394,7 @@ const updateActorsRangeDependentEffects = async token => {
     ).rangeMeasurement;
 
     for (let effect of token.actor?.allApplicableEffects() ?? []) {
-        if (!effect.system.rangeDependence?.enabled) continue;
+        if (!effect.system.rangeDependence) continue;
         const { target, range, type } = effect.system.rangeDependence;
 
         // If there are no targets, assume false. Otherwise, start with the effect enabled.
