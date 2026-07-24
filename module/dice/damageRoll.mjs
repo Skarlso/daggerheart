@@ -1,5 +1,5 @@
 import DamageDialog from '../applications/dialogs/damageDialog.mjs';
-import { parseRallyDice, triggerChatRollFx } from '../helpers/utils.mjs';
+import { getCritDamageBonus, parseRallyDice, triggerChatRollFx } from '../helpers/utils.mjs';
 import DHRoll from './dhRoll.mjs';
 
 export default class DamageRoll extends DHRoll {
@@ -8,7 +8,17 @@ export default class DamageRoll extends DHRoll {
     }
 
     get isCritical() {
-        return !!this.options.isCritical;
+        return this.options.isCritical;
+    }
+
+    get modifierTotal() {
+        const criticalDamageBonus = this.isCritical ? getCritDamageBonus(this.terms) : 0;
+        return super.modifierTotal + criticalDamageBonus;
+    }
+
+    get total() {
+        const criticalDamageBonus = this.isCritical ? getCritDamageBonus(this.terms) : 0;
+        return super.total + criticalDamageBonus;
     }
 
     static DefaultDialog = DamageDialog;
@@ -24,6 +34,7 @@ export default class DamageRoll extends DHRoll {
         const evaluateRoll = async roll => {
             await roll.roll.evaluate();
             roll.roll.options = {
+                ...roll.roll.options,
                 damageTypes: roll.damageTypes ? [...roll.damageTypes] : [],
                 fullRestore: !!roll.fullRestore
             };
@@ -34,8 +45,10 @@ export default class DamageRoll extends DHRoll {
 
         if (config.damageFormula) {
             config.damage.main = await evaluateRoll(config.damageFormula);
-            config.damage.main.options = { damageTypes: 
-                config.damageFormula.damageTypes ? [...config.damageFormula.damageTypes] : []
+            config.damage.main.options = { 
+                ...config.damage.main.options,
+                damageTypes: 
+                    config.damageFormula.damageTypes ? [...config.damageFormula.damageTypes] : []
             };
         }
         
@@ -154,7 +167,7 @@ export default class DamageRoll extends DHRoll {
         if (!formulaData) return null;
         this.options.isCritical = config.isCritical;
 
-        formulaData.roll = new Roll(Roll.replaceFormulaData(formulaData.formula, config.data));
+        formulaData.roll = new this.constructor(Roll.replaceFormulaData(formulaData.formula, config.data));
         formulaData.roll.terms = Roll.parse(formulaData.roll.formula, config.data);
 
         if (formulaData.extraFormula) {
